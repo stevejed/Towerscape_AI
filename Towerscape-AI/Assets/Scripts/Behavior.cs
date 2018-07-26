@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Behavior
+// • constitutes an abstract class from which all Behaviors inherit
 public abstract class Behavior : MonoBehaviour {
 
     //Variables//
@@ -12,6 +14,8 @@ public abstract class Behavior : MonoBehaviour {
          * 
          */
     };
+
+
 
 
     //Constructors//

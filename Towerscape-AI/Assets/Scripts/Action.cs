@@ -2,53 +2,72 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//Encapsulating class for a possible Action of a unit
-public class Action {
+// Action
+// • encapsulates a possible Action for a Unit to perform
+//   · stores set of Considerations and an associated Behavior
+//   · provides an 'Appropriateness Score' based on Unit's Considerations
+//   · provides a means of executing the associated Behavior
+[System.Serializable]
+public class Action
+{
 
-    //Variables//
+    // variables //
 
-    private string                    name;           //Name argument passed in for Action
-    private Behavior                  behavior;       //Behavior instance for Action
-    private LinkedList<Consideration> considerations; //List of considerations to determine Action's appropriateness
+
+    // variables for: action scoring and behavior execution //
+    [SerializeField][HideInInspector]
+    private string name;                        // setting - global - private: action name
+    private Behavior behavior;                  // setting - global - private: behavior for action to potentially execute
+    [SerializeField]
+    private List<Consideration> considerations; // setting - global - private: set of considerations for determining the Action's appropriateness score
+
+
 
 
     //Constructor//
 
-    /*Constructor for an Action
-        * param string          inName           - Name of Action read in from Excel sheet
-        * param inBehavior      inBehavior       - Name of Behavior
-        * param Consideration[] inConsiderations - 
-        */
+    // constructs an instance of an Action: //
+    // * param inName     - name of the Action read in from the file
+    // * param inBehavior - behavior of the Action read in from the file
     public Action(string inName = "N/a", Behavior inBehavior = null)
     {
         this.name = inName;
         this.behavior = inBehavior;
-        this.considerations = new LinkedList<Consideration>;
+        this.considerations = new List<Consideration>();
     }
 
 
     //Methods//
 
-    /*Adds consideration to the Action's consideration list
-     * param string inInput - Input type read in from Excel sheet
-     * param string inCurve - Curve Type read in from Excel sheet
-     * param float  m       - Slope of function
-     * param float  k       - Vertical size of curve
-     * param float  b       - Y-intercept (vertical shift)
-     * param float  c       - X-intercept (horizontal shift)
-     */
+    // method - public: constructs an instance of a Consideration and adds it to the Action's list: //
+    //  * param string inInput - Input type read in from Excel sheet
+    //  * param string inCurve - Curve Type read in from Excel sheet
+    //  * param float m        - Slope of function
+    //  * param float k        - Vertical size of curve
+    //  * param float b        - Y-intercept(vertical shift)
+    //  * param float c        - X-intercept(horizontal shift)
     public void AddConsideration(string inInput, string inCurve="QUADRATIC", float m=0.0f, float k=0.0f, float b=0.0f, float c=0.0f)
     {
-        considerations.AddLast(new Consideration(inInput, inCurve, m, k, b, c));
+        considerations.Add(new Consideration(inInput, inCurve, m, k, b, c));
     }
 
-    //Executes Action's associated Behavior
+    // method - public: executes the Action's associated behavior //
     public void Execute()
     {
-        behavior.Execute();
+        Debug.Log("Action: " + name + " was selected.");
+        if(behavior != null) //TODO this should never happen, fix to output exception instead
+        {
+            behavior.Execute();
+        }
     }
 
-    //Gets the appropriateness of the given Action
+    // method - public: returns the action's considerations //
+    public List<Consideration> GetConsiderations() { return considerations; }
+
+    // method - public: returns the name of the action //
+    public string GetName() { return name; }
+    
+    // method - public: returns the appropriateness score of the given Action //
     public float GetScore()
     {
         float apprScore = 1.0f;
@@ -64,90 +83,14 @@ public class Action {
         return apprScore;
     }
 
-
-    //Inputs that impact an Action's appropriateness score
-    private class Consideration
+    // method - public: provides a string-based representation //
+    public override string ToString()
     {
-
-        //Variables//
-
-        private enum Curves
+        string output = "Name: " + name + ", Behavior: TODO, Considerations:\n";
+        foreach (Consideration curr in considerations)
         {
-            LOGARITHMIC,
-            LOGISTIC,
-            QUADRATIC
-        };
-
-        //Instance
-        private Curves curve; //Function curve type
-        private float m;      //Slope of function
-        private float k;      //Vertical size of curve
-        private float b;      //Y-intercept (vertical shift)
-        private float c;      //X-intercept (horizontal shift)
-        private Input input;  //Input instance for accessing game state information to run through consideration function
-
-
-        //Constructor//
-
-        /*Constructs consideration instance
-         * param string inInput - Input type read in from Excel sheet
-         * param string inCurve - Curve Type read in from Excel sheet
-         * param float  m       - Slope of function
-         * param float  k       - Vertical size of curve
-         * param float  b       - Y-intercept (vertical shift)
-         * param float  c       - X-intercept (horizontal shift)
-         */
-        public Consideration(string inInput, string inCurve = "QUADRATIC", float m = 0.0f, float k = 0.0f, float b = 0.0f, float c = 0.0f)
-        {
-            //Constructs Input instance
-            this.input = new Input(inInput);
-
-            //Searches for Curve enum value of the given input
-            string caps = inCurve.ToUpper();
-            string[] names = System.Enum.GetNames(typeof(Curves));
-            Curves[] values = (Curves[])System.Enum.GetValues(typeof(Curves));
-            bool found = false;
-            for (int i = 0; i < names.Length; i++)
-            {
-                if (names[i].Equals(caps))
-                {
-                    curve = values[i];
-                    found = true;
-                    break;
-                }
-            }
-
-            //Case where given input is not defined
-            if (!found)
-                throw new System.InvalidOperationException("No case currently in place for handling input '" + inCurve + "'.");
+            output += "          " + curr.ToString() + "\n";
         }
-
-
-        //Methods//
-
-        //Returns the appropriateness value of the Consideration instance
-        public float GetValue()
-        {
-            float rawValue;
-
-            //Runs consideration input in order to get raw appropriateness value
-            switch (curve)
-            {
-                case Curves.LOGARITHMIC:
-                    rawValue = m * Mathf.Log(input.GetValue() + c, k) + b;
-                    break;
-                case Curves.LOGISTIC:
-                    rawValue = k / (1 + Mathf.Exp(-m * (input.GetValue() - c))) + b;
-                    break;
-                case Curves.QUADRATIC:
-                    rawValue = m * Mathf.Pow(input.GetValue() - c, k) + b;
-                    break;
-            }
-
-            /*TO-DO: Normalization operations of function weights
-             */
-
-            return rawValue;
-        }
+        return output;
     }
 }
