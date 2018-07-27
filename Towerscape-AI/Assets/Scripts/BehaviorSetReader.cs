@@ -52,39 +52,71 @@ public class BehaviorSetReader : MonoBehaviour {
 
         //Initializes action list storage components
         LinkedList<Action> actionList = new LinkedList<Action>();
-        Action curr = null;
+        string currActionName = "";
+        string currBehaviorName = "";
+        Dictionary<string, string> currBehaviorParams = null;
+        LinkedList<Consideration> currConsiderations = null;
 
-        //Iterates through remaining rows for Action set
-        while (true)
+        //iterates through sheet and parses out Actions
+        while(true)
         {
             string[] currLine = reader.ReadRow();
 
             //If no more lines, then break
-            if (currLine == null)
-                break;
-
-            if(currLine[0] != "")
+            if(currLine == null)
             {
-                curr = new Action(currLine[0]);
-                actionList.AddLast(curr);
+                //Constructs last action
+                Behavior newBehavior = GenerateBehavior(currBehaviorName, currBehaviorParams);
+                List<Consideration> newConsiderations = new List<Consideration>(currConsiderations.Count);
+                foreach (Consideration curr in currConsiderations)
+                {
+                    newConsiderations.Add(curr);
+                }
+                actionList.AddLast(new Action(currActionName, newBehavior, newConsiderations));
+
+                break;
             }
 
-            /*TO-DO: Develop Behavior construction method
-             * 
-             */
-
-            if (currLine[4] != null)
+            //new Action
+            if(currLine[0] != "")
             {
-                //Adds Consideration to current Action
+                //If not the first action, instantiate the Action
+                if(currBehaviorParams != null && currConsiderations != null)
+                {
+                    Behavior newBehavior = GenerateBehavior(currBehaviorName, currBehaviorParams);
+                    List<Consideration> newConsiderations = new List<Consideration>(currConsiderations.Count);
+                    foreach(Consideration curr in currConsiderations)
+                    {
+                        newConsiderations.Add(curr);
+                    }
+                    actionList.AddLast(new Action(currActionName, newBehavior, newConsiderations));
+                }
+
+                //Resets counters
+                currActionName = currLine[0];
+                currBehaviorName = currLine[1];
+                currBehaviorParams = new Dictionary<string, string>();
+                currConsiderations = new LinkedList<Consideration>();
+            }
+
+            //new Behavior param
+            if(currLine[2] != "")
+            {
+                currBehaviorParams.Add(currLine[2], currLine[3]);
+            }
+
+            //new Consideration
+            if(currLine[4] != "")
+            {
                 float i = 0.0f;
                 float cSlope = float.TryParse(currLine[6], out i) ? i : 0.0f;  //Consideration curve slope
                 float cExp = float.TryParse(currLine[7], out i) ? i : 0.0f;    //Consideration curve exponent
                 float cVert = float.TryParse(currLine[8], out i) ? i : 0.0f;   //Y-Intercept (vertical shift)
                 float cHoriz = float.TryParse(currLine[9], out i) ? i : 0.0f; //X-Intercept (horizontal shift)
 
-                curr.AddConsideration(currLine[4],                //Consideration name
-                                      currLine[5],                //Consideration curve type
-                                      cSlope, cExp, cVert, cHoriz);
+                currConsiderations.AddLast(new Consideration(currLine[4],                   //Consideration name
+                                                             currLine[5],                   //Consideration curve type
+                                                             cSlope, cExp, cVert, cHoriz));
             }
         }
 
@@ -155,7 +187,8 @@ public class BehaviorSetReader : MonoBehaviour {
         LinkedList<string> actionStrings = new LinkedList<string>();
         foreach(Action currentAction in actions)
         {
-            List<StringBuilder> currentActionStrings = new List<StringBuilder>(Mathf.Max(currentAction.GetConsiderations().Count, 0));//TODO update 0 value to be size of Behavior parameters
+            List<StringBuilder> currentActionStrings = new List<StringBuilder>(Mathf.Max(currentAction.GetConsiderations().Count,
+                                                                                         currentAction.GetBehaviorParameters().Length));
             for(int index = 0; index < currentActionStrings.Capacity; index++)
             {
                 currentActionStrings.Add(new StringBuilder());
@@ -167,19 +200,19 @@ public class BehaviorSetReader : MonoBehaviour {
             {
                 if(place++ == 0)
                 {
-                    currentStringBuilder.Append(currentAction.GetName() + ",<BEHAVIOR>,");
+                    currentStringBuilder.Append(currentAction.GetName() + "," + currentAction.GetBehaviorName() + ",");
                 }
                 else
                 {
-                    currentStringBuilder.Append(",,");
+                    currentStringBuilder.Append(",,,,");
                 }
             }
 
-            //TODO update to get behavior parameters
+            //Adds behavior parameters to current action's strings
             place = 0;
-            foreach(StringBuilder currentStringBuilder in currentActionStrings)
+            foreach(string currBehaviorParam in currentAction.GetBehaviorParameters())
             {
-                currentStringBuilder.Append(",,");
+                currentActionStrings[place++].Append(currBehaviorParam + ",");
             }
 
             //Adds considerations to current action's strings
@@ -204,5 +237,52 @@ public class BehaviorSetReader : MonoBehaviour {
             linesToWrite[i++] = curr;
         }
         return linesToWrite;
+    }
+
+    // method - private: generates a behavior child class instance and returns it for action initialization //
+    //   * param inName   - Name of the behavior 
+    //   * param inParams - Set of parameters
+    private Behavior GenerateBehavior(string inName, Dictionary<string, string> inParams)
+    {
+        //Searches for Behavior enum value of given input
+        Behavior.Behaviors classToImplement = Behavior.Behaviors.NONE;
+        string caps = inName.ToUpper();
+        string[] names = System.Enum.GetNames(typeof(Behavior.Behaviors));
+        Behavior.Behaviors[] values = (Behavior.Behaviors[])System.Enum.GetValues(typeof(Behavior.Behaviors));
+        bool found = false;
+        for (int i = 0; i < names.Length; i++)
+        {
+            if (names[i].Equals(caps))
+            {
+                classToImplement = values[i];
+                found = true;
+                break;
+            }
+        }
+
+        ////Exception handling
+        if (!found)
+            throw new System.InvalidOperationException("No case currently in place for handling behavior '" + inName + "'.");
+        //if (inParams != null) { throw new MissingReferenceException("Behavior instance was not given a set of parameters."); }
+
+        return GetBehaviorInstance(classToImplement, inName, inParams);
+    }
+
+    // method - private: generates and returns a behavior instance based on the enum type //
+    //   * param classToImplement - enum type of behavior class to initialize
+    //   * param inName           - Name of the behavior 
+    //   * param inParams         - Set of parameters
+    private Behavior GetBehaviorInstance(Behavior.Behaviors classToImplement, string inName, Dictionary<string, string> inParams)
+    {
+        switch(classToImplement)
+        {
+            /*TODO
+             * Implement return methods for each potential Behavior class type
+             */
+            case Behavior.Behaviors.MOVE:
+                return new BehaviorMove(inName, inParams);
+            default:
+                return null;
+        }
     }
 }

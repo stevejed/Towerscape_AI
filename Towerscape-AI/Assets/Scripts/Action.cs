@@ -29,11 +29,14 @@ public class Action
     // constructs an instance of an Action: //
     // * param inName     - name of the Action read in from the file
     // * param inBehavior - behavior of the Action read in from the file
-    public Action(string inName = "N/a", Behavior inBehavior = null)
+    public Action(string inName = "N/a", Behavior inBehavior = null, List<Consideration> inConsiderations = null)
     {
         this.name = inName;
         this.behavior = inBehavior;
-        this.considerations = new List<Consideration>();
+        if (inConsiderations == null)
+            this.considerations = new List<Consideration>();
+        else
+            this.considerations = inConsiderations;
     }
 
 
@@ -66,6 +69,12 @@ public class Action
 
     // method - public: returns the name of the action //
     public string GetName() { return name; }
+
+    // method - public: returns the name of the action's behavior //
+    public string GetBehaviorName() { return behavior.GetName(); }
+
+    // method - public: returns the action's behavior parameters //
+    public string[] GetBehaviorParameters() { return behavior.GetParameters(); }
     
     // method - public: returns the appropriateness score of the given Action //
     public float GetScore()
@@ -86,7 +95,9 @@ public class Action
     // method - public: provides a string-based representation //
     public override string ToString()
     {
-        string output = "Name: " + name + ", Behavior: TODO, Considerations:\n";
+        string output = "Name: " + name + "\n     Behavior: ";
+        output += (behavior != null) ? behavior.ToString() : "NONE";
+        output += "\n     Considerations:\n";
         foreach (Consideration curr in considerations)
         {
             output += "          " + curr.ToString() + "\n";

@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Action.cs" />
     <Compile Include="Assets\Scripts\Behavior.cs" />
+    <Compile Include="Assets\Scripts\BehaviorMove.cs" />
     <Compile Include="Assets\Scripts\BehaviorSetReader.cs" />
     <Compile Include="Assets\Scripts\Consideration.cs" />
     <Compile Include="Assets\Scripts\CsvReadWrite.cs" />

@@ -5,7 +5,6 @@ using UnityEngine;
 // Consideration
 // • constitutes a Consideration, providing a weight for the associated Action's appropriateness score
 //   · stores a function and input reference for encoding game state information for action selection
-
 [System.Serializable]
 public class Consideration {
 
