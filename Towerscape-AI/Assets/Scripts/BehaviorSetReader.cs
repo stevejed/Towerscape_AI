@@ -279,8 +279,9 @@ public class BehaviorSetReader : MonoBehaviour {
             /*TODO
              * Implement return methods for each potential Behavior class type
              */
-            case Behavior.Behaviors.MOVE:
-                return new BehaviorMove(inName, inParams);
+            case Behavior.Behaviors.SAMPLE:
+                return new BehaviorSample(inName, inParams);
+            // ****NOTE**** Set up a case for returning each potential Behavior class type
             default:
                 return null;
         }

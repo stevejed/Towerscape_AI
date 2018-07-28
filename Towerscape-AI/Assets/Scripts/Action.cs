@@ -40,6 +40,8 @@ public class Action
     }
 
 
+
+
     //Methods//
 
     // method - public: constructs an instance of a Consideration and adds it to the Action's list: //
@@ -58,7 +60,7 @@ public class Action
     public void Execute()
     {
         Debug.Log("Action: " + name + " was selected.");
-        if(behavior != null) //TODO this should never happen, fix to output exception instead
+        if(behavior != null) //TODO behavior should never be null, fix this
         {
             behavior.Execute();
         }
@@ -86,10 +88,12 @@ public class Action
             apprScore *= curr.GetValue();
         }
 
-        /*TO-DO: Normalization of appropriateness value
-         */
+        // "compensation factor" for self-balancing against consideration count
+        float modificationFactor = 1 - (1 / considerations.Count);
+        float makeUpValue = (1 - apprScore) * modificationFactor;
+        float finalScore = apprScore + (makeUpValue * apprScore);
 
-        return apprScore;
+        return finalScore;
     }
 
     // method - public: provides a string-based representation //

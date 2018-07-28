@@ -11,7 +11,7 @@ public abstract class Behavior {
     public enum Behaviors //TODO document this; what's the standard for enums and their values?
     {
         NONE,
-        MOVE,
+        SAMPLE,
         /*TO-DO: List out possible behaviors
          * 
          */

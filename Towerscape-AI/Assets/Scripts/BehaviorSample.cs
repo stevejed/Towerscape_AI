@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// BehaviorMove
+// BehaviorSample
 // • sample Behavior class for showcasing how to develop a Behavior
-public class BehaviorMove : Behavior {
+public class BehaviorSample : Behavior {
 
     // Variables //
 
@@ -20,7 +20,7 @@ public class BehaviorMove : Behavior {
     // method - public: instantiates a behavior move instance //
     //   * param inName   - Name of the behavior 
     //   * param inParams - Set of parameters
-    public BehaviorMove(string inName = "NONE", Dictionary<string, string> inParams = null) : base(inName, inParams)
+    public BehaviorSample(string inName = "NONE", Dictionary<string, string> inParams = null) : base(inName, inParams)
     {
         //****NOTE**** Assign any class-specific variables (Target, Speed, etc.) here
     }
