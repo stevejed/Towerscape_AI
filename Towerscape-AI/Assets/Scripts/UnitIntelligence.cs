@@ -9,9 +9,10 @@ public class UnitIntelligence : MonoBehaviour {
 
     // Variables //
 
-    // variables for: file read/write of an action set file //
-    [Header("File Read/Write")][SerializeField]
-    public Object actionSetFile;
+    // CURRENTLY DEPRECATED - Logic passed to UnitPrefabBootstrapper //
+    //// variables for: file read/write of an action set file //
+    //[Header("File Read/Write")][SerializeField]
+    //public Object actionSetFile;
 
     // variables for: debugging action selection operation //
     [Header("Debug")][SerializeField]
@@ -71,29 +72,30 @@ public class UnitIntelligence : MonoBehaviour {
         }
     }
 
-    // method - public: reads the instance's action set from the file //
-    public void ReadInBehaviors()
-    {
-        if (!GetComponent<BehaviorSetReader>())
-        {
-            BehaviorSetReader reader = gameObject.AddComponent<BehaviorSetReader>();
-            reader.actionSetFile = this.actionSetFile;
-            reader.unitIntelligenceScript = this;
-        }
-        GetComponent<BehaviorSetReader>().ReadInBehaviors();
-    }
+    // CURRENTLY DEPRECATED - Logic passed to UnitPrefabBootstrapper //
+    //// method - public: reads the instance's action set from the file //
+    //public void ReadInBehaviors()
+    //{
+    //    if (!GetComponent<BehaviorSetReader>())
+    //    {
+    //        BehaviorSetReader reader = gameObject.AddComponent<BehaviorSetReader>();
+    //        reader.actionSetFile = this.actionSetFile;
+    //        reader.unitIntelligenceScript = this;
+    //    }
+    //    GetComponent<BehaviorSetReader>().ReadInBehaviors();
+    //}
 
-    // method - public: writes the instance's action set to the file //
-    public void WriteOutBehaviors()
-    {
-        if (!GetComponent<BehaviorSetReader>())
-        {
-            BehaviorSetReader reader = gameObject.AddComponent<BehaviorSetReader>();
-            reader.actionSetFile = this.actionSetFile;
-            reader.unitIntelligenceScript = this;
-        }
-        GetComponent<BehaviorSetReader>().WriteOutBehaviors();
-    }
+    //// method - public: writes the instance's action set to the file //
+    //public void WriteOutBehaviors()
+    //{
+    //    if (!GetComponent<BehaviorSetReader>())
+    //    {
+    //        BehaviorSetReader reader = gameObject.AddComponent<BehaviorSetReader>();
+    //        reader.actionSetFile = this.actionSetFile;
+    //        reader.unitIntelligenceScript = this;
+    //    }
+    //    GetComponent<BehaviorSetReader>().WriteOutBehaviors();
+    //}
 
 
 
@@ -106,7 +108,7 @@ public class UnitIntelligence : MonoBehaviour {
         {
             GetComponent<Canvas>().enabled = true;
         }
-        ReadInBehaviors();
+        //ReadInBehaviors();
 	}
 	
 	// at each frame: //

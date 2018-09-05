@@ -32,15 +32,17 @@ public class UnitIntelligenceEditor : Editor {
     // on opening of the Unit Intelligence instance GUI: //
     public override void OnInspectorGUI()
     {
-        EditorGUILayout.PropertyField(actionSetFile, true);
+        base.OnInspectorGUI();
 
-        UnitIntelligence myScript = (UnitIntelligence) target;
-        if (GUILayout.Button("Read in Behavior Set"))
-            myScript.ReadInBehaviors();
-        if (GUILayout.Button("Write Behavior Set to File"))
-            myScript.WriteOutBehaviors();
-
-        EditorGUILayout.PropertyField(actions, true);
+        //EditorGUILayout.PropertyField(actionSetFile, true);
+        //
+        //UnitIntelligence myScript = (UnitIntelligence) target;
+        //if (GUILayout.Button("Read in Behavior Set"))
+        //    myScript.ReadInBehaviors();
+        //if (GUILayout.Button("Write Behavior Set to File"))
+        //    myScript.WriteOutBehaviors();
+        //
+        //EditorGUILayout.PropertyField(actions, true);
 
         serializedObject.ApplyModifiedProperties();
         Repaint();

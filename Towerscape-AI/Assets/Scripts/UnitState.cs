@@ -8,27 +8,45 @@ public class UnitState : MonoBehaviour {
 
 
     // variables for: combat and movement //
-    float ammo;
-    float attackDamage;
-    float hp;
-    float range;
-    float speed;
+    [SerializeField]
+    private float ammo;
+    [SerializeField]
+    private float attackDamage;
+    [SerializeField]
+    private float hp;
+    [SerializeField]
+    private float range;
+    [SerializeField]
+    private float speed;
 
     // variables for: drops //
-    int goldDropped;
-    GameObject itemDropped;
+    [SerializeField]
+    private int goldDropped;
+    [SerializeField]
+    private GameObject itemDropped;
 
     // variables for: player interaction and spawning //
-    bool grabbable;
-    int unitCost;
+    [SerializeField]
+    private bool grabbable;
+    [SerializeField]
+    private int unitCost;
 
     // variables for: animation triggers //
     /*TO-DO
-     * * Populate w/ animation triggers
+     * * Populate w/ animation triggers (possibly w/ an enum?)
      */
 
 
     // Methods //
+
+    // Methods for: getting UnitState components //
+    public float getAmmo() { return ammo; }
+    public float getAttackDamage() { return attackDamage; }
+    public float getHP() { return hp; }
+    public float getRange() { return range; }
+    public float getSpeed() { return speed; }
+    public bool getGrabbable() { return grabbable; }
+    public int getUnitCost() { return unitCost; }
 
     // Method for: Taking damage and modifying the unit's health.  If it drops below 0, the unit dies.
     public void takeDamage(float damage)
@@ -45,13 +63,4 @@ public class UnitState : MonoBehaviour {
     {
         Destroy(gameObject);
     }
-
-    // Methods for: getting UnitState components //
-    public float getAmmo() { return ammo; }
-    public float getAttackDamage(){ return attackDamage; }
-    public float getHP() { return hp; }
-    public float getRange() { return range; }
-    public float getSpeed() { return speed; }
-    public bool getGrabbable() { return grabbable; }
-    public int getUnitCost() { return unitCost; }
 }
